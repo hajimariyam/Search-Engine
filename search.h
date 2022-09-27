@@ -8,8 +8,10 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <set>
 #include <map>
+#include <vector>
 using namespace std;
 
 
@@ -65,12 +67,42 @@ set<string> gatherTokens(string text)
 
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
-int buildIndex(string filename, map<string, set<string>>& index) {
-    
-    
+int buildIndex(string filename, map<string, set<string>>& index) 
+{
+    cout << "Stand by while building index...\n";    
+
+    ifstream fileStream(filename);
+    if (fileStream.fail()) {
+        return 0;
+    }
+
+    int urlCounter = 0;
+    string webpageURL;
+    string webpageText;
+
+    getline(fileStream, webpageURL);
+    while (webpageURL != "") {
+        urlCounter++;
+        
+        getline(fileStream, webpageText);
+        set <string> setOfTokens = gatherTokens(webpageText);
+
+        for (string token : setOfTokens) {
+            if (index.find(token) != index.end()) {
+                index.find(token)->second.insert(webpageURL);
+            }
+            else {
+                set <string> setOfURLs;
+                setOfURLs.insert(webpageURL);
+                index.emplace(token, setOfURLs);
+            }
+        }
+        
+        getline(fileStream, webpageURL);
+    }
     
     // return the count of web pages that were processed from the file and added to the index
-    return 0;
+    return urlCounter;
 }
 
 
