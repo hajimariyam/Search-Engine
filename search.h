@@ -11,7 +11,6 @@
 #include <fstream>
 #include <set>
 #include <map>
-#include <vector>
 using namespace std;
 
 
@@ -106,27 +105,107 @@ int buildIndex(string filename, map<string, set<string>>& index)
 }
 
 
+set<string> SetUnion(set<string> set1, set<string> set2) 
+{
+    set<string> result;
+    for (string urlInSet1 : set1) {
+        result.insert(urlInSet1);
+    }
+    for (string urlInSet2 : set2) {
+        result.insert(urlInSet2);
+    }
+    return result;
+}
+
+
+set<string> SetIntersection(set<string> set1, set<string> set2) 
+{
+    set<string> result;
+    for (string urlInSet1 : set1) {
+        if (set2.find(urlInSet1) != set2.end()) {
+            result.insert(urlInSet1);
+        }
+    }
+    return result;
+}
+
+
+set<string> SetDifference(set<string> set1, set<string> set2) 
+{
+    set<string> result;
+    for (string urlInSet1 : set1) {
+        if (set2.find(urlInSet1) == set2.end()) {
+            result.insert(urlInSet1);
+        }
+    }
+    return result;
+}
+
+
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
-set<string> findQueryMatches(map<string, set<string>>& index, string sentence) {
+set<string> findQueryMatches(map<string, set<string>>& index, string query) 
+{
     set<string> result;
     
-    
-    // TODO:  Write this function.
-    
-    
-    return result;  // TODO:  update this.
+    query = cleanToken(query);
+
+    string tempString;
+    stringstream myStringStream (query);
+
+    while (getline (myStringStream, tempString, ' ')) {
+        if (tempString[0] == '-') {
+            tempString = cleanToken(tempString);
+            result = SetDifference(result, index.find(tempString)->second);
+        }
+
+        else if (tempString[0] == '+') {
+            tempString = cleanToken(tempString);
+            result = SetIntersection(result, index.find(tempString)->second);
+        }
+
+        else {
+            result = SetUnion(result, index.find(tempString)->second);
+        }
+    }
+
+    return result;
 }
 
 
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
-void searchEngine(string filename) {
+void searchEngine(string filename) 
+{
+    // construct  inverted index from the contents of the database file
+    map<string, set<string>> index;
+    int totalWebpages = buildIndex(filename, index);
 
+    // prints how many web pages were processed to build the index and how many distinct words were found across all pages
+    cout << "Indexed " << totalWebpages << " pages containing " << index.size() << " unique terms" << endl;
+
+    // enter a loop that prompts the user to enter a query
+    string userQuery;
+
+    cout << "\nEnter query sentence (press enter to quit): ";
+    getline (cin, userQuery);
+
+    while (userQuery != "") {
+        set<string> result = findQueryMatches(index, userQuery);
+
+        cout << "Found " << result.size() << " matching pages" << endl;
+
+        for (string thisURL : result) {
+            cout << thisURL << endl;
+        }
+
+        cout << "\nEnter query sentence (press enter to quit): ";
+        getline (cin, userQuery);
+    }
     
-    // TODO:  Write this function.
-    
-    
+    cout << "Thank you for searching!";
+    exit(0);
+
+    // for each query entered by the user, it finds the matching pages and prints the URLs
+    // the user presses enter (empty string) to indicate they are done and the program finishes executing
 }
-
-
