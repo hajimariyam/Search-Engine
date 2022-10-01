@@ -28,10 +28,12 @@
 #include <fstream>
 #include <set>
 #include <map>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 
-// Parameter: String of characters (token)
+// Parameter: Whitespace-separated string of characters (token)
 // Behavior: Clean token by trimming (replacing with "") any leading or trailing punctuation characters 
 //           (recognized via ispunct()) and convert each character to lowercase (via tolower()).
 // Return value: "Cleaned" token, or empty string if the token contains no letters (assessed via isalpha())
@@ -86,12 +88,17 @@ set<string> gatherTokens(string text)
 }
 
 
+int indexHelper1(ifstream &fileStream, map<string, set<string>>& index, vector <string> stopWords);
+
+void indexHelper2(map<string, set<string>>& index, string webpageURL, string token);
+
+
 // Parameters: 1) name of file with webpage data, 2) map to be populated as an inverted index using the file data
-// Data files: Formatted in 2-line pairs for each webpage as such: 1) URL, 2) body text
-// Behavior: After reading a line of body text, extract the set of unique, cleaned tokens using gatherTokens().
+// Data files are formatted in 2-line pairs for each webpage as such: 1) URL, 2) body text
+// Behavior: Use gatherTokens() to extract the set of unique, cleaned tokens in each line of body text.
 //           If a token exists as a key in the map, add the URL to the set that is its value. 
 //           Otherwise, emplace the token as a key in the map and create a new set with the URL and set as the value. 
-// The inverted index map associates each token (key) with a set of URLs (value) where that token can be found. 
+// The inverted index map that associates each token (key) with a set of URLs (value) where that token can be found. 
 // Return value: Count of webpages from the data file that were processed and added to the index
 int buildIndex(string filename, map<string, set<string>>& index) 
 {
@@ -102,6 +109,49 @@ int buildIndex(string filename, map<string, set<string>>& index)
         return 0;
     }
 
+    vector <string> stopWords;      // expected to be empty
+    int urlCounter = indexHelper1(fileStream, index, stopWords);
+    
+    fileStream.close();
+
+    return urlCounter;
+}
+
+
+int buildNoStopWordsIndex (string filename, string fileStopWords, map<string, set<string>>& index) {
+    cout << "Stand by while building index without stop words...\n";    
+
+    // handle stop words
+    ifstream fileStream1(fileStopWords);
+    if (fileStream1.fail()) {
+        return 0;
+    }
+
+    vector <string> stopWords;
+    string thisStopWord;
+
+    while (getline(fileStream1, thisStopWord)) {
+        stopWords.push_back(thisStopWord);
+    }
+
+    fileStream1.close();
+
+    // handle data file
+    ifstream fileStream2(filename);
+    if (fileStream2.fail()) {
+        return 0;
+    }
+
+    int urlCounter = indexHelper1(fileStream2, index, stopWords);
+    
+    fileStream2.close();
+
+    return urlCounter;
+}
+
+
+int indexHelper1(ifstream &fileStream, map<string, set<string>>& index, vector <string> stopWords) 
+{
     int urlCounter = 0;
     string webpageURL;
     string webpageText;
@@ -114,20 +164,30 @@ int buildIndex(string filename, map<string, set<string>>& index)
         set <string> setOfTokens = gatherTokens(webpageText);
 
         for (string token : setOfTokens) {
-            if (index.find(token) != index.end()) {
-                index.find(token)->second.insert(webpageURL);
+            if ( stopWords.size() == 0 ) {
+                indexHelper2(index, webpageURL, token);
             }
-            else {
-                set <string> setOfURLs;
-                setOfURLs.insert(webpageURL);
-                index.emplace(token, setOfURLs);
+            else if ( stopWords.size() != 0  && (find(stopWords.begin(), stopWords.end(), token) == (stopWords.end())) ) {     // for other index and if not a stop word
+                indexHelper2(index, webpageURL, token);
             }
         }
-        
+
         getline(fileStream, webpageURL);
     }
-    
+
     return urlCounter;
+}
+
+
+void indexHelper2(map<string, set<string>>& index, string webpageURL, string token) {
+    if ( index.find(token) != index.end() ) {
+        index.find(token)->second.insert(webpageURL);
+    }
+    else {
+        set <string> setOfURLs;
+        setOfURLs.insert(webpageURL);
+        index.emplace(token, setOfURLs);
+    }
 }
 
 
@@ -219,6 +279,7 @@ void searchEngine(string filename)
 {
     map<string, set<string>> index;
     int totalWebpages = buildIndex(filename, index);
+    // buildNoStopWordsIndex (filename, "stopwords.txt", index);
 
     cout << "Indexed " << totalWebpages << " pages containing " << index.size() << " unique terms" << endl;
 
@@ -242,3 +303,6 @@ void searchEngine(string filename)
     cout << "Thank you for searching!";
     exit(0);
 }
+
+
+
