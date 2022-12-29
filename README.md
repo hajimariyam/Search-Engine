@@ -6,7 +6,7 @@ This C++ program uses map and set abstractions to build a document search engine
 
 ## User Interface
 
-
+<img src='https://github.com/hajimariyam/Search-Engine/blob/main/gif.gif' width='65%' />
 
 ## Details
 
