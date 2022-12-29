@@ -17,9 +17,9 @@
  The default Snowball stoplist used in this program as "stopwords.txt" can be found at:
  https://github.com/igorbrigadir/stopwords/blob/master/en/snowball_original.txt
  
- TO RUN CREATIVE COMPONENT: Ensure "stopwords.txt" exists in the same folder. Uncomment line 217 of search.h in 
- searchEngine() and comment line 216. Then, make a call to searchEngine() in main.cpp. To change the stopwords 
- file, either add another file named "stopwords.txt" or change the file name on line 251 in retrieveStopWords().
+ TO RUN CREATIVE COMPONENT: Ensure "stopwords.txt" exists in the same folder. Uncomment line 214 of 
+ search.h in searchEngine() and comment line 213. To change the stopwords file, either add another 
+ file named "stopwords.txt" or change the file name on line 248 in retrieveStopWords().
 */
 
 
@@ -216,7 +216,7 @@ void searchEngine (string filename)
     cout << "Indexed " << totalWebpages << " pages containing " << index.size() << " unique terms" << endl;
 
     string userQuery;
-    cout << "\nEnter query sentence (press enter to quit): ";
+    cout << "\nEnter query sentence (press enter to restart): ";
     getline (cin, userQuery);
 
     while (userQuery != "") {
@@ -228,12 +228,11 @@ void searchEngine (string filename)
             cout << thisURL << endl;
         }
 
-        cout << "\nEnter query sentence (press enter to quit): ";
+        cout << "\nEnter query sentence (press enter to restart): ";
         getline (cin, userQuery);
     }
     
-    cout << "Thank you for searching!";
-    exit(0);
+    return;
 }
 
 
