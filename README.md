@@ -41,7 +41,7 @@ Clock classes provide access to the current time_point.steady_clock is specifica
  
 - Weighted search results, sorted by most relevant to least relevant. A simple approach is to re-think the index to include the number of matches and give a higher rank to pages with more occurrences of the search term.
 
-- Multi-word search, by keeping track of where in each document a word is to determine if words in a search phrase are next to each other in any particular document.
+- Search phrases, by keeping track of where in each document a word is to determine if words in the query phrase are next to each other in any particular document.
 
 - Stemming, or reducing words to their base form. For example, "section" and "sections" would become "section" in the index.
 
