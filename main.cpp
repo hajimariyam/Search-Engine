@@ -1,13 +1,9 @@
 /*
- CS 251 - Data Structures 
- Project 2 - Search Engine
-
+ Project: Search Engine
  Author: Mariyam Haji 
- NetID: mhaji7
-
  System: Visual Studio Code on Windows 10
  
- This program uses the map and set abstractions to build a document search engine.
+ This program uses map and set abstractions to build a document search engine.
  The search engine finds webpages with body text that matches a user's query. 
  The body text of each page is pre-processed and stored as an inverted index 
  in a data structure that allows lightning-fast retrieval of search results. 
@@ -140,9 +136,13 @@ int main() {
     // also tested set operations using such queries: "vector", "vector and", "vector +and", "vector -and", etc.
 
     */
-   
 
-    searchEngine("cplusplus.txt");
+    string fileName;
+    cout << "\nEnter file name: ";
+    getline (cin, fileName);
+    fileName = "datafiles/" + fileName;
+
+    searchEngine(fileName);
 
     return 0;
 }

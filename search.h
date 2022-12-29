@@ -1,13 +1,9 @@
 /*
- CS 251 - Data Structures 
- Project 2 - Search Engine
-
+ Project: Search Engine
  Author: Mariyam Haji 
- NetID: mhaji7
-
  System: Visual Studio Code on Windows 10
  
- This program uses the map and set abstractions to build a document search engine.
+ This program uses map and set abstractions to build a document search engine.
  The search engine finds webpages with body text that matches a user's query. 
  The body text of each page is pre-processed and stored as an inverted index 
  in a data structure that allows lightning-fast retrieval of search results. 
@@ -163,6 +159,7 @@ set<string> SetDifference (const set<string>& set1, const set<string>& set2);
              1) If prefaced with '-', remove matches for that term from existing results.
              2) If prefaced with '+', intersect matches for that term with existing results.
              3) Otherwise, union matches across search terms or existing results.
+             The function returns appropriately if search query is not found in index.
    Return value: Set of matched URL strings 
 */
 set<string> findQueryMatches (map<string, set<string>>& index, string query) 
@@ -296,7 +293,8 @@ int indexHelper1 (ifstream &fileStream, map<string, set<string>>& index, const v
              - if the token exists as a key in the map, add the URL to the set that is its value. 
              - otherwise, emplace the token as a key in the map and create a new set with the URL and set as the value. 
 */
-void indexHelper2 (map<string, set<string>>& index, const vector <string>& stopWords, string webpageURL, string token) {
+void indexHelper2 (map<string, set<string>>& index, const vector <string>& stopWords, string webpageURL, string token) 
+{
     if (stopWords.size() == 0 || 
         (stopWords.size() != 0  && (find(stopWords.begin(), stopWords.end(), token) == stopWords.end())))
     {
